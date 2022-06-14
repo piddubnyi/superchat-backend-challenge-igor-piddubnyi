@@ -3,8 +3,12 @@ package com.digiscorp.superchat.service
 import com.digiscorp.superchat.dto.IncomingMsgDto
 import com.digiscorp.superchat.persistance.ContactId
 import com.digiscorp.superchat.persistance.ContactRepository
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import kotlin.random.Random
+import java.net.URL
 
 @Component
 class PlaceholderReplacer(val replacers: List<Replacer>) {
@@ -30,9 +34,31 @@ class NameReplacer(var repository: ContactRepository) : Replacer{
 }
 
 @Component
-class RandomPriceReplacer() : Replacer{
+class BitPayPriceReplacer(
+        @Value("\${bitpay.uri}") val bitPayUri: String,
+        val mapper: ObjectMapper
+) : Replacer{
+
+    var currentPrice: Double = fetchPrice()
+
+    @Scheduled(fixedDelay = 60_000)
+    fun refreshPrice() {
+        currentPrice = fetchPrice()
+    }
+    private fun fetchPrice(): Double {
+        val typeRef = object : TypeReference<List<CoinPrice>>() {}
+        val priceList: List<CoinPrice> = mapper.readValue(URL(bitPayUri), typeRef)
+        return priceList.filter { it.code.equals("USD") }.map { it.rate }.first()
+    }
+
     override fun update(content: String, src: String, msg: IncomingMsgDto): String {
-        return content.replace("@price", Random.nextDouble().toString())
+        return content.replace("@price", "$currentPrice$")
     }
 }
+
+data class CoinPrice (
+        val code: String,
+        val name: String,
+        val rate: Double
+)
 

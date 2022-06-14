@@ -10,7 +10,6 @@ import javax.transaction.Transactional
 
 @Service
 class ContactService(val contactRepository: ContactRepository) {
-
     @Transactional
     fun createContact(me: String, contact: ContactDto): ContactDto {
         contactRepository.save(ContactEntity(ContactId(me, contact.email), contact.name))

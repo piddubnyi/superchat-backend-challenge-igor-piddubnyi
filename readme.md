@@ -5,7 +5,6 @@
 Known outstanding problems (assignment already is big enough, making a "perfect" solution will take more time that I'm willing to spend for unpaid assignment):
  - Absence of unit/integration testing
  - Absence of the incoming/outgoing message indication in the conversations.
- - Bitcoin price is generated as random value (if the expectation was to connect some external price provider, this should be clearly specified)
  - No dedicated API for webhook (with current state same api method can be used to send and receive msgs, by swapping "me" header and destanation)
 
 # Steps to test

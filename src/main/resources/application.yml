@@ -9,3 +9,5 @@ spring:
       ddl-auto: create-drop
       format-sql: true
       dialect: org.hibernate.dialect.PostgreSQL10Dialect
+bitpay:
+  uri: https://bitpay.com/api/rates
