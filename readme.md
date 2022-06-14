@@ -2,10 +2,9 @@
 
 ## Used stack :Kotlin, Spring (faster to use compared to Quarkus), Postgres, Hibernate, Docker
 
-Known outstanding problems (assignment already is big enough, making a "perfect" solution will take more time that I'm willing to spend for unpaid assignment):
+Known outstanding problems:
  - Absence of unit/integration testing
- - Absence of the incoming/outgoing message indication in the conversations.
- - No dedicated API for webhook (with current state same api method can be used to send and receive msgs, by swapping "me" header and destanation)
+ - No dedicated API for webhook (with current state same api method can be used to send and receive msgs, by swapping "me" header and destination)
 
 # Steps to test
 Start the db:
