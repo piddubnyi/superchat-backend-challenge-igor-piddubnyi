@@ -1,7 +1,8 @@
 package com.digiscorp.superchat.controller
 
 import com.digiscorp.superchat.dto.ContactDto
-import com.digiscorp.superchat.dto.IncomingMsgDto
+import com.digiscorp.superchat.dto.ConversationMsgDto
+import com.digiscorp.superchat.dto.OutgoingMsgDto
 import com.digiscorp.superchat.dto.MsgDto
 import com.digiscorp.superchat.service.ChatService
 import com.digiscorp.superchat.service.ContactService
@@ -23,12 +24,12 @@ class ChatController(val chatService: ChatService, val contactService: ContactSe
     }
 
     @PostMapping("/msgs")
-    fun sendMsg(@RequestBody msg: IncomingMsgDto, @RequestHeader me: String): ResponseEntity<MsgDto> {
+    fun sendMsg(@RequestBody msg: OutgoingMsgDto, @RequestHeader me: String): ResponseEntity<MsgDto> {
         return ResponseEntity.status(HttpStatus.CREATED).body(chatService.processMessage(me, msg))
     }
 
     @GetMapping("/msgs")
-    fun listConversations(@RequestHeader me: String): ResponseEntity<Map<String, List<MsgDto>?>> {
+    fun listConversations(@RequestHeader me: String): ResponseEntity<Map<String, List<ConversationMsgDto>?>> {
         return ResponseEntity.status(HttpStatus.OK).body(chatService.conversations(me))
     }
 }

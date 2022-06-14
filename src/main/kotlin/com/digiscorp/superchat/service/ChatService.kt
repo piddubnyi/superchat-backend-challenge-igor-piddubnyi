@@ -1,6 +1,7 @@
 package com.digiscorp.superchat.service
 
-import com.digiscorp.superchat.dto.IncomingMsgDto
+import com.digiscorp.superchat.dto.ConversationMsgDto
+import com.digiscorp.superchat.dto.OutgoingMsgDto
 import com.digiscorp.superchat.dto.MsgDto
 import com.digiscorp.superchat.persistance.ContactId
 import com.digiscorp.superchat.persistance.ContactRepository
@@ -16,22 +17,24 @@ class ChatService(
     val placeholderReplacer: PlaceholderReplacer
 ) {
 
-    fun conversations(user: String): Map<String, List<MsgDto>?> {
-        return contactRepository.findAllByIdSrc(user).associate { it.id.dst to it.messages?.map { MsgDto(it.ts, it.content) } }
+    fun conversations(user: String): Map<String, List<ConversationMsgDto>?> {
+        return contactRepository.findAllByIdSrc(user)
+            .associate { it.name to it.messages?.map { msgEntity -> ConversationMsgDto(msgEntity.ts, msgEntity.content, msgEntity.isIncoming) } }
     }
 
     @Transactional
-    fun processMessage(me: String, msg: IncomingMsgDto): MsgDto {
+    fun processMessage(me: String, msg: OutgoingMsgDto): MsgDto {
         val updatedMsg = placeholderReplacer.replacePlaceholders(me, msg)
-        val forwardContact = contactRepository.findById(ContactId(me, updatedMsg.dst))
-        val backwardContact = contactRepository.findById(ContactId(updatedMsg.dst, me))
-        if(forwardContact.isPresent && backwardContact.isPresent){
-            val savedMsg = msgRepository.save(MsgEntity(updatedMsg.ts, updatedMsg.content))
-            forwardContact.get().messages?.add(savedMsg)
-            backwardContact.get().messages?.add(savedMsg)
-            return updatedMsg
-        } else {
-            throw IllegalArgumentException("Not in contacts : " + updatedMsg.dst)
+        saveMessageForPresentContact(me, msg.dst, updatedMsg, true)
+        saveMessageForPresentContact(msg.dst, me, updatedMsg, false)
+        return updatedMsg
+    }
+
+    private fun saveMessageForPresentContact(src: String, dst: String, msg: OutgoingMsgDto, isOutgoing: Boolean) {
+        val contact = contactRepository.findById(ContactId(src, dst))
+        if (contact.isPresent) {
+            val savedMsg = msgRepository.save(MsgEntity(msg.ts, msg.content, isOutgoing))
+            contact.get().messages?.add(savedMsg)
         }
     }
 }

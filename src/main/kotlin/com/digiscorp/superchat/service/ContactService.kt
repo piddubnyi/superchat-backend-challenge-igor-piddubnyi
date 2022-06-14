@@ -12,12 +12,11 @@ import javax.transaction.Transactional
 class ContactService(val contactRepository: ContactRepository) {
     @Transactional
     fun createContact(me: String, contact: ContactDto): ContactDto {
-        contactRepository.save(ContactEntity(ContactId(me, contact.email), contact.name))
-        contactRepository.save(ContactEntity(ContactId(contact.email, me), me))
+        contactRepository.save(ContactEntity(ContactId(me, contact.channelId), contact.name, contact.channelType))
         return contact
     }
 
     fun listContacts(me: String): List<ContactDto> {
-        return contactRepository.findAllByIdSrc(me).map { ContactDto(it.name, it.id.dst) }
+        return contactRepository.findAllByIdSrc(me).map { ContactDto(it.name, it.type, it.id.dst) }
     }
 }

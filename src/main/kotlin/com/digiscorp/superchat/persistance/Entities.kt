@@ -1,5 +1,6 @@
 package com.digiscorp.superchat.persistance
 
+import com.digiscorp.superchat.dto.ChannelType
 import java.time.Instant
 import javax.persistence.*
 
@@ -15,6 +16,8 @@ class ContactEntity(
     val id: ContactId,
     @Column
     val name: String,
+    @Column
+    val type: ChannelType,
 
     @Column(nullable = true)
     @ManyToMany
@@ -23,11 +26,13 @@ class ContactEntity(
 
 @Entity
 class MsgEntity(
-    @Column
+        @Column
     val ts: Instant,
-    @Column
+        @Column
     val content: String,
-    @Id
+        @Column
+    val isIncoming: Boolean,
+        @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     val id: Int? = null,
 )

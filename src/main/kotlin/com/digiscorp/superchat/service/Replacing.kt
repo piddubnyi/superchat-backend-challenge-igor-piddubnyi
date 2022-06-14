@@ -1,6 +1,6 @@
 package com.digiscorp.superchat.service
 
-import com.digiscorp.superchat.dto.IncomingMsgDto
+import com.digiscorp.superchat.dto.OutgoingMsgDto
 import com.digiscorp.superchat.persistance.ContactId
 import com.digiscorp.superchat.persistance.ContactRepository
 import com.fasterxml.jackson.core.type.TypeReference
@@ -13,23 +13,27 @@ import java.net.URL
 @Component
 class PlaceholderReplacer(val replacers: List<Replacer>) {
 
-    fun replacePlaceholders(src: String, msg: IncomingMsgDto): IncomingMsgDto {
+    fun replacePlaceholders(src: String, msg: OutgoingMsgDto): OutgoingMsgDto {
         var content: String = msg.content
         for (repl in replacers){
             content = repl.update(content, src, msg)
         }
-        return IncomingMsgDto(msg.dst, msg.ts, content)
+        return OutgoingMsgDto(msg.dst, msg.ts, content)
     }
 }
 
 interface Replacer{
-    fun update(content: String, src: String, msg: IncomingMsgDto): String
+    fun update(content: String, src: String, msg: OutgoingMsgDto): String
 }
 
 @Component
 class NameReplacer(var repository: ContactRepository) : Replacer{
-    override fun update(content: String, src: String, msg: IncomingMsgDto): String {
-        return content.replace("@name", repository.findById(ContactId(src, msg.dst)).get().name)
+    override fun update(content: String, src: String, msg: OutgoingMsgDto): String {
+        val contactEntityOptional = repository.findById(ContactId(src, msg.dst))
+        if(contactEntityOptional.isPresent) {
+            return content.replace("@name", contactEntityOptional.get().name)
+        }
+        return content
     }
 }
 
@@ -51,7 +55,7 @@ class BitPayPriceReplacer(
         return priceList.filter { it.code.equals("USD") }.map { it.rate }.first()
     }
 
-    override fun update(content: String, src: String, msg: IncomingMsgDto): String {
+    override fun update(content: String, src: String, msg: OutgoingMsgDto): String {
         return content.replace("@price", "$currentPrice$")
     }
 }

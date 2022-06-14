@@ -15,22 +15,20 @@ Start the main in the application: com.digiscorp.superchat.SuperchatApplicationK
 
 Run the requests:
 
-### Create contacts (me created implicitly)
-curl -X POST -H 'Content-Type: application/json' -H 'me: igor@mail.com' -d '{"name": "Max", "email": "max@mail.com"}' 'http://127.0.0.1:8080/contacts'
-
-curl -X POST -H 'Content-Type: application/json' -H 'me: igor@mail.com' -d '{"name": "Alex", "email": "alex@mail.com"}' 'http://127.0.0.1:8080/contacts'
+### Create contacts
+curl -X POST -H 'Content-Type: application/json' -H 'me: igor@mail.com' -d '{"name": "Max", "channelType" : "EMAIL", "channelId": "max@mail.com"}' 'http://127.0.0.1:8080/contacts'
+curl -X POST -H 'Content-Type: application/json' -H 'me: igor@mail.com' -d '{"name": "Alex", "channelType" : "SMS", "channelId": "+123456"}' 'http://127.0.0.1:8080/contacts'
+curl -X POST -H 'Content-Type: application/json' -H 'me: +123456' -d '{"name": "Igor", "channelType" : "EMAIL", "channelId": "igor@mail.com"}' 'http://127.0.0.1:8080/contacts'
 
 ### List contacts
 curl -X GET -H 'me: igor@mail.com' 'http://127.0.0.1:8080/contacts'
 
 ### Send msgs with placeholders
-curl -X POST -H 'Content-Type: application/json' -H 'me: alex@mail.com' -d '{"dst": "igor@mail.com", "ts": 1655149223937, "content": "Hi @name!"}' 'http://127.0.0.1:8080/msgs'
+curl -X POST -H 'Content-Type: application/json' -H 'me: +123456' -d '{"dst": "igor@mail.com", "ts": 1655149223937, "content": "Hi @name!"}' 'http://127.0.0.1:8080/msgs'
 
-curl -X POST -H 'Content-Type: application/json' -H 'me: igor@mail.com' -d '{"dst": "alex@mail.com", "ts": 1655149223938, "content": "Nice to see you @name"}' 'http://127.0.0.1:8080/msgs'
+curl -X POST -H 'Content-Type: application/json' -H 'me: igor@mail.com' -d '{"dst": "+123456", "ts": 1655149223938, "content": "Nice to see you @name"}' 'http://127.0.0.1:8080/msgs'
 
 curl -X POST -H 'Content-Type: application/json' -H 'me: igor@mail.com' -d '{"dst": "max@mail.com", "ts": 1655149223939, "content": "Hey @name, BTC now costs @price!"}' 'http://127.0.0.1:8080/msgs'
 
 ### Get conversations
 curl -X GET -H 'me: igor@mail.com' 'http://127.0.0.1:8080/msgs'
-
-curl -X GET -H 'me: alex@mail.com' 'http://127.0.0.1:8080/msgs'
