@@ -1,6 +1,5 @@
 package com.digiscorp.superchat.persistance
 
-import com.digiscorp.superchat.dto.ChannelType
 import java.time.Instant
 import javax.persistence.*
 
@@ -11,28 +10,57 @@ class ContactId(
 ) : java.io.Serializable
 
 @Entity
-class ContactEntity(
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+open class ContactEntity(
     @EmbeddedId
-    val id: ContactId,
+    open val id: ContactId,
     @Column
-    val name: String,
-    @Column
-    val type: ChannelType,
-
+    open val name: String,
     @Column(nullable = true)
     @ManyToMany
-    val messages: MutableList<MsgEntity>? = mutableListOf()
+    open val messages: MutableList<MsgEntity>? = mutableListOf()
 )
 
 @Entity
+class SmsContactEntity(
+        id: ContactId,
+        name: String,
+        @Column
+        val number: String,
+        messages: MutableList<MsgEntity>
+) : ContactEntity(id, name, messages)
+
+@Entity
+class EmailContactEntity(
+    id: ContactId,
+    name: String,
+    @Column
+    val email: String,
+    messages: MutableList<MsgEntity>
+) : ContactEntity(id, name, messages)
+
+@Entity
 class MsgEntity(
-        @Column
+    @Column
     val ts: Instant,
-        @Column
+    @Column
     val content: String,
-        @Column
+    @Column
     val isIncoming: Boolean,
-        @Id
+    @Column(nullable = true)
+    @OneToMany
+    val properties: MutableList<MsgProperty>? = mutableListOf(),
+    @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    val id: Int? = null,
+    val id: Int? = null
+)
+@Entity
+class MsgProperty (
+    @Column
+    val key: String,
+    @Column
+    val value: String,
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    val id: Int? = null
 )

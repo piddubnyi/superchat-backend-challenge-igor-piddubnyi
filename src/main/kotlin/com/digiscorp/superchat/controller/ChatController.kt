@@ -19,7 +19,7 @@ class ChatController(val chatService: ChatService, val contactService: ContactSe
     }
 
     @GetMapping("/contacts")
-    fun listContacts(@RequestHeader me: String): ResponseEntity<List<ContactDto>> {
+    fun listContacts(@RequestHeader me: String): ResponseEntity<List<ContactDto?>> {
         return ResponseEntity.status(HttpStatus.OK).body(contactService.listContacts(me))
     }
 

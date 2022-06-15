@@ -14,11 +14,10 @@ import java.net.URL
 class PlaceholderReplacer(val replacers: List<Replacer>) {
 
     fun replacePlaceholders(src: String, msg: OutgoingMsgDto): OutgoingMsgDto {
-        var content: String = msg.content
         for (repl in replacers){
-            content = repl.update(content, src, msg)
+            msg.content = repl.update(msg.content, src, msg)
         }
-        return OutgoingMsgDto(msg.dst, msg.ts, content)
+        return msg
     }
 }
 
